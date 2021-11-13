@@ -20,6 +20,6 @@ func getHttpClient() okhttp.Client {
 	return clientBuilder.SetHeaders(commonHeaders).
 		SetConnectionTimeout(1 * time.Second).
 		SetResponseTimeout(4 * time.Second).
-		SetUserAgent("OKCoding")
-	Build()
+		SetUserAgent("OKCoding").
+		Build()
 }
