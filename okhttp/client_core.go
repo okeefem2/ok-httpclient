@@ -10,6 +10,9 @@ import (
 	"net/http"
 	"strings"
 	"time"
+
+	"github.com/okeefem2/ok-httpclient/core"
+	"github.com/okeefem2/ok-httpclient/okhttp_mock"
 )
 
 const (
@@ -19,7 +22,7 @@ const (
 )
 
 // Private method on httpClient struct
-func (c *httpClient) do(method string, url string, headers http.Header, body interface{}) (*Response, error) {
+func (c *httpClient) do(method string, url string, headers http.Header, body interface{}) (*core.Response, error) {
 
 	fullHeaders := c.getRequestHeaders(headers)
 
@@ -29,7 +32,7 @@ func (c *httpClient) do(method string, url string, headers http.Header, body int
 		return nil, err
 	}
 
-	if mock := mocks.getMock(method, url, string(requestBody)); mock != nil {
+	if mock := okhttp_mock.GetMock(method, url, string(requestBody)); mock != nil {
 		return mock.GetResponse()
 	}
 
@@ -53,11 +56,11 @@ func (c *httpClient) do(method string, url string, headers http.Header, body int
 		return nil, err
 	}
 
-	finalResponse := Response{
-		status:     response.Status,
-		statusCode: response.StatusCode,
-		headers:    response.Header,
-		body:       bytes,
+	finalResponse := core.Response{
+		Status:     response.Status,
+		StatusCode: response.StatusCode,
+		Headers:    response.Header,
+		Body:       bytes,
 	}
 	return &finalResponse, nil
 

@@ -1,4 +1,4 @@
-package okhttp
+package okhttp_mock
 
 import (
 	"crypto/md5"
@@ -68,11 +68,11 @@ func (m *mockServer) cleanBody(body string) string {
 	return body
 }
 
-func (m *mockServer) getMock(method string, url string, body string) *Mock {
-	if !m.enabled {
+func GetMock(method string, url string, body string) *Mock {
+	if !mocks.enabled {
 		return nil
 	}
-	mock := m.mocks[m.getMockKey(method, url, body)]
+	mock := mocks.mocks[mocks.getMockKey(method, url, body)]
 
 	if mock != nil {
 		return mock

@@ -13,7 +13,7 @@ func GetGame(key string) (*Game, error) {
 		return nil, err
 	}
 
-	fmt.Println(response.StatusCode())
+	fmt.Println(response.StatusCode)
 	fmt.Println(response.String())
 	var game Game
 
