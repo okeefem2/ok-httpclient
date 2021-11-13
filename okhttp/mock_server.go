@@ -1,7 +1,10 @@
 package okhttp
 
 import (
+	"crypto/md5"
+	"encoding/hex"
 	"fmt"
+	"strings"
 	"sync"
 )
 
@@ -42,8 +45,27 @@ func AddMock(mock Mock) {
 	mocks.mocks[key] = &mock
 }
 
+func RemoveMocks() {
+	mocks.mocks = make(map[string]*Mock)
+}
+
 func (m *mockServer) getMockKey(method string, url string, body string) string {
-	return method + url + body
+	// md5 is faster, not as secure, but in this case the security is not as important
+	// Curious does map hash the key?
+	hasher := md5.New()
+	hasher.Write([]byte(method + url + m.cleanBody(body)))
+	key := hex.EncodeToString(hasher.Sum(nil))
+	return key
+}
+
+func (m *mockServer) cleanBody(body string) string {
+	body = strings.TrimSpace(body)
+	if body == "" {
+		return ""
+	}
+	body = strings.ReplaceAll(body, "\t", "")
+	body = strings.ReplaceAll(body, "\n", "")
+	return body;
 }
 
 func (m *mockServer) getMock(method string, url string, body string) *Mock {

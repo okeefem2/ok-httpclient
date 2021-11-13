@@ -8,12 +8,12 @@ import (
 )
 
 func TestGetRequestHeaders(t *testing.T) {
-
-	client := httpClient{}
 	commonHeaders := make(http.Header)
 	commonHeaders.Set("Content-Type", "application/json")
 	commonHeaders.Set("User-Agent", "ok-http-client1")
-	client.builder.headers = commonHeaders
+	builder := clientBuilder{ headers: commonHeaders }
+	client := httpClient{ builder: &builder }
+
 
 	requestHeaders := make(http.Header)
 	// Should be added

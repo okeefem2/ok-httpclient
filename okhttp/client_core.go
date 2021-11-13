@@ -136,18 +136,21 @@ func (c *httpClient) getRequestBody(contentType string, body interface{}) ([]byt
 func (c *httpClient) getRequestHeaders(customHeaders http.Header) http.Header {
 	result := make(http.Header)
 		// Add common headers
-	for header, value := range c.builder.headers {
-		if len(value) > 0 {
-			result.Set(header, value[0])
+		if c.builder != nil {
+			for header, value := range c.builder.headers {
+				if len(value) > 0 {
+					result.Set(header, value[0])
+				}
 		}
 	}
 
-	// Add custom headers
-	for header, value := range customHeaders {
-		if len(value) > 0 {
-			result.Set(header, value[0])
+	if customHeaders != nil {
+		// Add custom headers
+		for header, value := range customHeaders {
+			if len(value) > 0 {
+				result.Set(header, value[0])
+			}
 		}
-	}
-
+		}
 	return result
 }

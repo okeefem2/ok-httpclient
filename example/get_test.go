@@ -20,6 +20,7 @@ func TestMain(m *testing.M) {
 
 func TestGet(t* testing.T) {
 	t.Run("TestErrorFetching", func(t *testing.T) {
+		okhttp.RemoveMocks()
 		key := "0fb9c447-ae36-41ba-bfa5-57f89d08160a"
 
 		okhttp.AddMock(okhttp.Mock{
@@ -45,6 +46,7 @@ func TestGet(t* testing.T) {
 	});
 
 	t.Run("TestErrorUnmarshalResponseBody", func(t *testing.T) {
+		okhttp.RemoveMocks()
 		key := "0fb9c447-ae36-41ba-bfa5-57f89d08160a"
 
 		okhttp.AddMock(okhttp.Mock{
@@ -70,6 +72,7 @@ func TestGet(t* testing.T) {
 	});
 
 	t.Run("TestNoError", func(t *testing.T) {
+		okhttp.RemoveMocks()
 		key := "0fb9c447-ae36-41ba-bfa5-57f89d08160a"
 
 		okhttp.AddMock(okhttp.Mock{
