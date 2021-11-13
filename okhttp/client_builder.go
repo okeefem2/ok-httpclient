@@ -11,15 +11,21 @@ type ClientBuilder interface {
 	SetResponseTimeout(timeout time.Duration) ClientBuilder
 	SetMaxIdleConnections(max int) ClientBuilder
 	DisableTimeouts(disable bool) ClientBuilder
+	SetHttpClient(c *http.Client) ClientBuilder
+	SetUserAgent(agent string) ClientBuilder
+
 	Build() Client
 }
 
 type clientBuilder struct {
 	maxIdleConnections int
-	connectionTimeout time.Duration
-	responseTimeout time.Duration
-	disableTimeouts bool
-	headers http.Header
+	connectionTimeout  time.Duration
+	responseTimeout    time.Duration
+	disableTimeouts    bool
+	headers            http.Header
+	userAgent          string
+	// baseUrl string
+	client *http.Client
 }
 
 func (c *clientBuilder) SetHeaders(headers http.Header) ClientBuilder {
@@ -47,13 +53,23 @@ func (c *clientBuilder) DisableTimeouts(disable bool) ClientBuilder {
 	return c
 }
 
+func (c *clientBuilder) SetHttpClient(client *http.Client) ClientBuilder {
+	c.client = client
+	return c
+}
+
+func (c *clientBuilder) SetUserAgent(agent string) ClientBuilder {
+	c.userAgent = agent
+	return c
+}
+
 // Titlecase = exported and public, this is our public API
 func NewBuilder() ClientBuilder {
 	builder := &clientBuilder{}
 	return builder
 }
 
-func (c*clientBuilder) Build() Client {
+func (c *clientBuilder) Build() Client {
 	client := httpClient{
 		builder: c,
 	}

@@ -1,13 +1,12 @@
 package okhttp
 
 type Mock struct {
-	Method string
-	Url string
+	Method      string
+	Url         string
 	RequestBody string
 
-
-	Error error
-	ResponseBody string
+	Error              error
+	ResponseBody       string
 	ResponseStatusCode int
 }
 
@@ -18,6 +17,6 @@ func (m *Mock) GetResponse() (*Response, error) {
 
 	return &Response{
 		statusCode: m.ResponseStatusCode,
-		body: []byte(m.ResponseBody),
+		body:       []byte(m.ResponseBody),
 	}, nil
 }

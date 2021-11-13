@@ -14,8 +14,8 @@ import (
 
 const (
 	defaultMaxIdleConnections = 5
-	defaultResponseTimeout = 5 * time.Second
-	defaultConnectionTimeout = 1 * time.Second
+	defaultResponseTimeout    = 5 * time.Second
+	defaultConnectionTimeout  = 1 * time.Second
 )
 
 // Private method on httpClient struct
@@ -23,14 +23,14 @@ func (c *httpClient) do(method string, url string, headers http.Header, body int
 
 	fullHeaders := c.getRequestHeaders(headers)
 
-	requestBody, err := c.getRequestBody(fullHeaders.Get("Content-Type"), body);
+	requestBody, err := c.getRequestBody(fullHeaders.Get("Content-Type"), body)
 
 	if err != nil {
 		return nil, err
 	}
 
 	if mock := mocks.getMock(method, url, string(requestBody)); mock != nil {
-			return mock.GetResponse()
+		return mock.GetResponse()
 	}
 
 	request, err := http.NewRequest(method, url, bytes.NewBuffer(requestBody))
@@ -54,19 +54,16 @@ func (c *httpClient) do(method string, url string, headers http.Header, body int
 	}
 
 	finalResponse := Response{
-		status: response.Status,
+		status:     response.Status,
 		statusCode: response.StatusCode,
-		headers: response.Header,
-		body: bytes,
+		headers:    response.Header,
+		body:       bytes,
 	}
 	return &finalResponse, nil
 
-
 }
 
-func (c* httpClient) getHttpClient() *http.Client {
-
-
+func (c *httpClient) getHttpClient() *http.Client {
 
 	if c.client != nil {
 		return c.client
@@ -74,11 +71,16 @@ func (c* httpClient) getHttpClient() *http.Client {
 
 	// This function will be run 1 time even in concurrent environments
 	c.clientOnce.Do(func() {
+		// Allow for client override
+		if c.builder.client != nil {
+			c.client = c.builder.client
+			return
+		}
 		c.client = &http.Client{
 			Timeout: c.getConnectionTimeout() + c.getResponseTimeout(),
 			Transport: &http.Transport{ // Transport is a RounTripper, which is an interface, so this needs to be a pointer... not sure on that yet but I'll do it
-				MaxIdleConnsPerHost: c.getMaxIdleConnections(), // Should be configured based on the traffic pattern of the app
-				ResponseHeaderTimeout: c.getResponseTimeout(), // How long to wait for a response
+				MaxIdleConnsPerHost:   c.getMaxIdleConnections(), // Should be configured based on the traffic pattern of the app
+				ResponseHeaderTimeout: c.getResponseTimeout(),    // How long to wait for a response
 				DialContext: (&net.Dialer{
 					Timeout: c.getConnectionTimeout(), // Max time to wait for a connection
 				}).DialContext, // got error "cannot call pointer method...", fixed by wrapping reference https://stackoverflow.com/questions/44543374/cannot-take-the-address-of-and-cannot-call-pointer-method-on
@@ -86,8 +88,7 @@ func (c* httpClient) getHttpClient() *http.Client {
 		}
 	})
 
-
-	return c.client;
+	return c.client
 }
 
 func (c *httpClient) getResponseTimeout() time.Duration {
@@ -123,34 +124,36 @@ func (c *httpClient) getRequestBody(contentType string, body interface{}) ([]byt
 	}
 
 	switch strings.ToLower(contentType) {
-		case "application/json":
-			return json.Marshal(body)
-		case "application/xml":
-			return xml.Marshal(body)
-		default:
-			return json.Marshal(body)
+	case "application/json":
+		return json.Marshal(body)
+	case "application/xml":
+		return xml.Marshal(body)
+	default:
+		return json.Marshal(body)
 	}
 }
 
-
 func (c *httpClient) getRequestHeaders(customHeaders http.Header) http.Header {
 	result := make(http.Header)
-		// Add common headers
-		if c.builder != nil {
-			for header, value := range c.builder.headers {
-				if len(value) > 0 {
-					result.Set(header, value[0])
-				}
-		}
-	}
-
-	if customHeaders != nil {
-		// Add custom headers
-		for header, value := range customHeaders {
+	// Add common headers
+	if c.builder != nil {
+		for header, value := range c.builder.headers {
 			if len(value) > 0 {
 				result.Set(header, value[0])
 			}
 		}
+	}
+
+	// Add custom headers
+	for header, value := range customHeaders {
+		if len(value) > 0 {
+			result.Set(header, value[0])
 		}
+	}
+
+	if c.builder.userAgent != "" && result.Get("User-Agent") != "" {
+		result.Set("User-Agent", c.builder.userAgent)
+	}
+
 	return result
 }

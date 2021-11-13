@@ -41,7 +41,7 @@ func StopMockServer() {
 func AddMock(mock Mock) {
 	mocks.serverMutex.Lock()
 	defer mocks.serverMutex.Unlock()
-	key := mocks.getMockKey(mock.Method, mock.Url,  mock.RequestBody)
+	key := mocks.getMockKey(mock.Method, mock.Url, mock.RequestBody)
 	mocks.mocks[key] = &mock
 }
 
@@ -65,7 +65,7 @@ func (m *mockServer) cleanBody(body string) string {
 	}
 	body = strings.ReplaceAll(body, "\t", "")
 	body = strings.ReplaceAll(body, "\n", "")
-	return body;
+	return body
 }
 
 func (m *mockServer) getMock(method string, url string, body string) *Mock {

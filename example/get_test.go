@@ -13,20 +13,20 @@ import (
 
 func TestMain(m *testing.M) {
 	fmt.Println("Starting tests for ok http client examples")
-		// Tell library to mock requests
-		okhttp.StartMockServer()
-		os.Exit(m.Run())
+	// Tell library to mock requests
+	okhttp.StartMockServer()
+	os.Exit(m.Run())
 }
 
-func TestGet(t* testing.T) {
+func TestGet(t *testing.T) {
 	t.Run("TestErrorFetching", func(t *testing.T) {
 		okhttp.RemoveMocks()
 		key := "0fb9c447-ae36-41ba-bfa5-57f89d08160a"
 
 		okhttp.AddMock(okhttp.Mock{
 			Method: http.MethodGet,
-			Url: "http://localhost:5005/games/" + key,
-			Error: errors.New("Timeout fetching game"),
+			Url:    "http://localhost:5005/games/" + key,
+			Error:  errors.New("Timeout fetching game"),
 		})
 
 		game, err := GetGame(key)
@@ -43,15 +43,15 @@ func TestGet(t* testing.T) {
 			t.Error("Invalid error message")
 		}
 
-	});
+	})
 
 	t.Run("TestErrorUnmarshalResponseBody", func(t *testing.T) {
 		okhttp.RemoveMocks()
 		key := "0fb9c447-ae36-41ba-bfa5-57f89d08160a"
 
 		okhttp.AddMock(okhttp.Mock{
-			Method: http.MethodGet,
-			Url: "http://localhost:5005/games/" + key,
+			Method:       http.MethodGet,
+			Url:          "http://localhost:5005/games/" + key,
 			ResponseBody: `{ "game": true }`,
 		})
 
@@ -69,23 +69,23 @@ func TestGet(t* testing.T) {
 			t.Error("Invalid error message")
 		}
 
-	});
+	})
 
 	t.Run("TestNoError", func(t *testing.T) {
 		okhttp.RemoveMocks()
 		key := "0fb9c447-ae36-41ba-bfa5-57f89d08160a"
 
 		okhttp.AddMock(okhttp.Mock{
-			Method: http.MethodGet,
-			Url: "http://localhost:5005/games/" + key,
+			Method:       http.MethodGet,
+			Url:          "http://localhost:5005/games/" + key,
 			ResponseBody: `{ "game": { "key": "0fb9c447-ae36-41ba-bfa5-57f89d08160a" } }`,
 		})
 
 		game, err := GetGame(key)
 
 		if game == nil {
-				t.Error("Expected game to be defined")
-				return
+			t.Error("Expected game to be defined")
+			return
 		}
 
 		if game.Game["key"] != key {
@@ -95,6 +95,6 @@ func TestGet(t* testing.T) {
 		if err != nil {
 			t.Error("Expected no error")
 		}
-	});
+	})
 
 }

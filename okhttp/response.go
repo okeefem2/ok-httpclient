@@ -6,12 +6,11 @@ import (
 )
 
 type Response struct {
-	status string
+	status     string
 	statusCode int
-	headers http.Header
-	body []byte
+	headers    http.Header
+	body       []byte
 }
-
 
 func (r *Response) Status() string {
 	return r.status
@@ -32,7 +31,6 @@ func (r *Response) Bytes() []byte {
 func (r *Response) String() string {
 	return string(r.body)
 }
-
 
 func (r *Response) UnmarshalJson(target interface{}) error {
 	return json.Unmarshal(r.body, target)

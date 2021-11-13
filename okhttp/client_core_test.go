@@ -11,9 +11,8 @@ func TestGetRequestHeaders(t *testing.T) {
 	commonHeaders := make(http.Header)
 	commonHeaders.Set("Content-Type", "application/json")
 	commonHeaders.Set("User-Agent", "ok-http-client1")
-	builder := clientBuilder{ headers: commonHeaders }
-	client := httpClient{ builder: &builder }
-
+	builder := clientBuilder{headers: commonHeaders}
+	client := httpClient{builder: &builder}
 
 	requestHeaders := make(http.Header)
 	// Should be added
@@ -26,15 +25,15 @@ func TestGetRequestHeaders(t *testing.T) {
 		t.Error("Expect 3 headers, got " + strconv.Itoa(len(finalHeaders)))
 	}
 
-	if (finalHeaders.Get("Content-Type") != "application/json") {
+	if finalHeaders.Get("Content-Type") != "application/json" {
 		t.Error("Expect Content-Tupe header to be set as a common header")
 	}
 
-	if (finalHeaders.Get("User-Agent") != "ok-http-client2") {
+	if finalHeaders.Get("User-Agent") != "ok-http-client2" {
 		t.Error("Expect User-Agent header to be overwritten by custom header")
 	}
 
-	if (finalHeaders.Get("X-request-id") != "ABC-123") {
+	if finalHeaders.Get("X-request-id") != "ABC-123" {
 		t.Error("Expect X-request-id header to be set as a custom header")
 	}
 }
