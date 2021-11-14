@@ -25,7 +25,7 @@ func (c *httpClientMock) Do(request *http.Request) (*http.Response, error) {
 			return nil, err
 		}
 
-		if mock := GetMock(request.Method, request.URL.String(), string(body)); mock != nil {
+		if mock := MockServer.GetMock(request.Method, request.URL.String(), string(body)); mock != nil {
 
 			if mock.Error != nil {
 				return nil, mock.Error
@@ -34,6 +34,7 @@ func (c *httpClientMock) Do(request *http.Request) (*http.Response, error) {
 				StatusCode: mock.ResponseStatusCode,
 				Body: ioutil.NopCloser(strings.NewReader(mock.ResponseBody)),
 				ContentLength: int64(len(mock.ResponseBody)),
+				Request: request,
 			}
 			return &response, nil
 		}

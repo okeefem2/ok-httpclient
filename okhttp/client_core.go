@@ -66,8 +66,8 @@ func (c *httpClient) do(method string, url string, headers http.Header, body int
 
 func (c *httpClient) getHttpClient() core.HttpClient {
 
-	if okhttp_mock.IsMockServerEnabled() {
-		return okhttp_mock.GetMockedClient()
+	if okhttp_mock.MockServer.IsEnabled() {
+		return okhttp_mock.MockServer.GetClient()
 	}
 
 	if c.client != nil {

@@ -9,9 +9,9 @@ import (
 	"github.com/okeefem2/ok-httpclient/core"
 )
 
-// Singleton mock mocks
+// Singleton mock MockServer
 var (
-	mocks = mockServer{
+	MockServer = mockServer{
 		mocks: make(map[string]*Mock),
 		httpClient: &httpClientMock{},
 	}
@@ -27,37 +27,37 @@ type mockServer struct {
 	httpClient core.HttpClient
 }
 
-func StartMockServer() {
-	mocks.serverMutex.Lock() // Other go routines will be stopped at this line until unlock is called by the goroutine with the lock
+func (m *mockServer) Start() {
+	m.serverMutex.Lock() // Other go routines will be stopped at this line until unlock is called by the goroutine with the lock
 	// I am assuming: this doesn't halt anything, because go will just de schedule the blocked go routines, but those won't get anything done while stuck here
 	// so probably a good idea not to have too much computation in locked code
-	defer mocks.serverMutex.Unlock()
-	mocks.enabled = true
+	defer m.serverMutex.Unlock()
+	m.enabled = true
 }
 
-func StopMockServer() {
-	mocks.serverMutex.Lock()
-	defer mocks.serverMutex.Unlock()
-	mocks.enabled = false
+func (m *mockServer) Stop() {
+	m.serverMutex.Lock()
+	defer m.serverMutex.Unlock()
+	m.enabled = false
 }
 
-func IsMockServerEnabled() bool {
-	return mocks.enabled
+func (m *mockServer) IsEnabled() bool {
+	return m.enabled
 }
 
-func GetMockedClient() core.HttpClient {
-	return mocks.httpClient
+func (m *mockServer) GetClient() core.HttpClient {
+	return m.httpClient
 }
 
-func AddMock(mock Mock) {
-	mocks.serverMutex.Lock()
-	defer mocks.serverMutex.Unlock()
-	key := mocks.getMockKey(mock.Method, mock.Url, mock.RequestBody)
-	mocks.mocks[key] = &mock
+func (m *mockServer) AddMock(mock Mock) {
+	m.serverMutex.Lock()
+	defer m.serverMutex.Unlock()
+	key := m.getMockKey(mock.Method, mock.Url, mock.RequestBody)
+	m.mocks[key] = &mock
 }
 
-func RemoveMocks() {
-	mocks.mocks = make(map[string]*Mock)
+func (m *mockServer) RemoveMocks() {
+	m.mocks = make(map[string]*Mock)
 }
 
 func (m *mockServer) getMockKey(method string, url string, body string) string {
@@ -79,10 +79,10 @@ func (m *mockServer) cleanBody(body string) string {
 	return body
 }
 
-func GetMock(method string, url string, body string) *Mock {
-	if !mocks.enabled {
+func (m *mockServer) GetMock(method string, url string, body string) *Mock {
+	if !m.enabled {
 		return nil
 	}
 
-	return mocks.mocks[mocks.getMockKey(method, url, body)]
+	return m.mocks[m.getMockKey(method, url, body)]
 }

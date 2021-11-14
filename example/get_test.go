@@ -14,16 +14,16 @@ import (
 func TestMain(m *testing.M) {
 	fmt.Println("Starting tests for ok http client examples")
 	// Tell library to mock requests
-	okhttp_mock.StartMockServer()
+	okhttp_mock.MockServer.Start()
 	os.Exit(m.Run())
 }
 
 func TestGet(t *testing.T) {
 	t.Run("TestErrorFetching", func(t *testing.T) {
-		okhttp_mock.RemoveMocks()
+		okhttp_mock.MockServer.RemoveMocks()
 		key := "0fb9c447-ae36-41ba-bfa5-57f89d08160a"
 
-		okhttp_mock.AddMock(okhttp_mock.Mock{
+		okhttp_mock.MockServer.AddMock(okhttp_mock.Mock{
 			Method: http.MethodGet,
 			Url:    "http://localhost:5005/games/" + key,
 			Error:  errors.New("Timeout fetching game"),
@@ -46,10 +46,10 @@ func TestGet(t *testing.T) {
 	})
 
 	t.Run("TestErrorUnmarshalResponseBody", func(t *testing.T) {
-		okhttp_mock.RemoveMocks()
+		okhttp_mock.MockServer.RemoveMocks()
 		key := "0fb9c447-ae36-41ba-bfa5-57f89d08160a"
 
-		okhttp_mock.AddMock(okhttp_mock.Mock{
+		okhttp_mock.MockServer.AddMock(okhttp_mock.Mock{
 			Method:       http.MethodGet,
 			Url:          "http://localhost:5005/games/" + key,
 			ResponseBody: `{ "game": true }`,
@@ -72,10 +72,10 @@ func TestGet(t *testing.T) {
 	})
 
 	t.Run("TestNoError", func(t *testing.T) {
-		okhttp_mock.RemoveMocks()
+		okhttp_mock.MockServer.RemoveMocks()
 		key := "0fb9c447-ae36-41ba-bfa5-57f89d08160a"
 
-		okhttp_mock.AddMock(okhttp_mock.Mock{
+		okhttp_mock.MockServer.AddMock(okhttp_mock.Mock{
 			Method:       http.MethodGet,
 			Url:          "http://localhost:5005/games/" + key,
 			ResponseBody: `{ "game": { "key": "0fb9c447-ae36-41ba-bfa5-57f89d08160a" } }`,
