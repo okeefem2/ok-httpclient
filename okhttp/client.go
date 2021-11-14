@@ -24,7 +24,7 @@ type Client interface {
 type httpClient struct {
 	builder *clientBuilder
 
-	client     *http.Client
+	client     core.HttpClient
 	clientOnce sync.Once
 }
 

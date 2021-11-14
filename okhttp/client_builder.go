@@ -3,6 +3,8 @@ package okhttp
 import (
 	"net/http"
 	"time"
+
+	"github.com/okeefem2/ok-httpclient/core"
 )
 
 type ClientBuilder interface {
@@ -11,7 +13,7 @@ type ClientBuilder interface {
 	SetResponseTimeout(timeout time.Duration) ClientBuilder
 	SetMaxIdleConnections(max int) ClientBuilder
 	DisableTimeouts(disable bool) ClientBuilder
-	SetHttpClient(c *http.Client) ClientBuilder
+	SetHttpClient(c core.HttpClient) ClientBuilder
 	SetUserAgent(agent string) ClientBuilder
 
 	Build() Client
@@ -25,7 +27,7 @@ type clientBuilder struct {
 	headers            http.Header
 	userAgent          string
 	// baseUrl string
-	client *http.Client
+	client core.HttpClient
 }
 
 func (c *clientBuilder) SetHeaders(headers http.Header) ClientBuilder {
@@ -53,7 +55,7 @@ func (c *clientBuilder) DisableTimeouts(disable bool) ClientBuilder {
 	return c
 }
 
-func (c *clientBuilder) SetHttpClient(client *http.Client) ClientBuilder {
+func (c *clientBuilder) SetHttpClient(client core.HttpClient) ClientBuilder {
 	c.client = client
 	return c
 }

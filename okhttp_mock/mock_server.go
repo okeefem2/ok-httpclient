@@ -3,15 +3,17 @@ package okhttp_mock
 import (
 	"crypto/md5"
 	"encoding/hex"
-	"fmt"
 	"strings"
 	"sync"
+
+	"github.com/okeefem2/ok-httpclient/core"
 )
 
 // Singleton mock mocks
 var (
 	mocks = mockServer{
 		mocks: make(map[string]*Mock),
+		httpClient: &httpClientMock{},
 	}
 )
 
@@ -21,6 +23,8 @@ type mockServer struct {
 	serverMutex sync.Mutex
 
 	mocks map[string]*Mock // TODO prefix trie
+
+	httpClient core.HttpClient
 }
 
 func StartMockServer() {
@@ -29,13 +33,20 @@ func StartMockServer() {
 	// so probably a good idea not to have too much computation in locked code
 	defer mocks.serverMutex.Unlock()
 	mocks.enabled = true
-
 }
 
 func StopMockServer() {
 	mocks.serverMutex.Lock()
 	defer mocks.serverMutex.Unlock()
 	mocks.enabled = false
+}
+
+func IsMockServerEnabled() bool {
+	return mocks.enabled
+}
+
+func GetMockedClient() core.HttpClient {
+	return mocks.httpClient
 }
 
 func AddMock(mock Mock) {
@@ -72,13 +83,6 @@ func GetMock(method string, url string, body string) *Mock {
 	if !mocks.enabled {
 		return nil
 	}
-	mock := mocks.mocks[mocks.getMockKey(method, url, body)]
 
-	if mock != nil {
-		return mock
-	}
-
-	return &Mock{
-		Error: fmt.Errorf("no mock matching %s from %s with the given body", method, url),
-	}
+	return mocks.mocks[mocks.getMockKey(method, url, body)]
 }

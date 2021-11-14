@@ -32,10 +32,6 @@ func (c *httpClient) do(method string, url string, headers http.Header, body int
 		return nil, err
 	}
 
-	if mock := okhttp_mock.GetMock(method, url, string(requestBody)); mock != nil {
-		return mock.GetResponse()
-	}
-
 	request, err := http.NewRequest(method, url, bytes.NewBuffer(requestBody))
 
 	if err != nil {
@@ -44,7 +40,9 @@ func (c *httpClient) do(method string, url string, headers http.Header, body int
 
 	request.Header = fullHeaders
 
-	response, err := c.getHttpClient().Do(request)
+	client := c.getHttpClient()
+
+	response, err := client.Do(request)
 	if err != nil {
 		return nil, err
 	}
@@ -66,7 +64,11 @@ func (c *httpClient) do(method string, url string, headers http.Header, body int
 
 }
 
-func (c *httpClient) getHttpClient() *http.Client {
+func (c *httpClient) getHttpClient() core.HttpClient {
+
+	if okhttp_mock.IsMockServerEnabled() {
+		return okhttp_mock.GetMockedClient()
+	}
 
 	if c.client != nil {
 		return c.client
@@ -79,6 +81,7 @@ func (c *httpClient) getHttpClient() *http.Client {
 			c.client = c.builder.client
 			return
 		}
+
 		c.client = &http.Client{
 			Timeout: c.getConnectionTimeout() + c.getResponseTimeout(),
 			Transport: &http.Transport{ // Transport is a RounTripper, which is an interface, so this needs to be a pointer... not sure on that yet but I'll do it
